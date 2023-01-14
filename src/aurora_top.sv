@@ -38,6 +38,7 @@ module aurora_top(
     channel_init i_channel_init(
         .clk,
         .rst_n,
+        .single_lane,
         .simplex_operations,
         .ordered_sets,
         .init_finished(channel_init_finished)
