@@ -27,7 +27,9 @@ module data_controller(
     input logic [MAX_LINKS_SIZE-1:0] lane_select,
     input logic channel_init_finished,
     input ordered_sets_t ordered_sets,
-    axi_stream_if.slave axi_stream,
-    output logic [MAX_LINKS-1:0][INTERMEDIATE_DATA_SIZE-1:0] tx_data
+    input logic axi_valid,
+    input logic axi_last,
+    input logic [AXI_DATA_SIZE-1:0] axi_data,
+    output logic [MAX_LINKS-1:0][INTERMEDIATE_DATA_SIZE-1:0] data_out
     );
 endmodule
