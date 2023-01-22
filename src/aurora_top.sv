@@ -27,7 +27,10 @@ module aurora_top(
     input logic single_lane,
     input logic [MAX_LINKS_SIZE-1:0] lane_select,
     axi_stream_if.slave axi_stream,
-    simplex_operations_if.TX simplex_operations,
+    input logic simplex_aligned,
+    input logic simplex_bonded,
+    input logic simplex_verified,
+    input logic simplex_reset,
     output logic [MAX_LINKS-1:0][ENCODED_DATA_SIZE-1:0] data_out
     );
 
@@ -39,7 +42,10 @@ module aurora_top(
         .clk,
         .rst_n,
         .single_lane,
-        .simplex_operations,
+        .simplex_aligned
+        .simplex_bonded
+        .simplex_verified
+        .simplex_reset
         .ordered_sets,
         .init_finished(channel_init_finished)
     );

@@ -25,7 +25,10 @@ module channel_init (
     input logic clk,
     input logic rst_n,
     input logic single_lane,
-    simplex_operations_if.TX simplex_operations,
+    input logic simplex_aligned,
+    input logic simplex_bonded,
+    input logic simplex_verified,
+    input logic simplex_reset,
     output ordered_sets_t ordered_sets,
     output logic init_finished
 );
@@ -43,7 +46,7 @@ states_e state, state_nxt;
 logic init_finished_nxt;
 
 always_ff @(posedge clk) begin
-    if (!rst_n) begin
+    if (!rst_n or simplex_reset) begin
         state <= RESET;
         ordered_sets <= ordered_sets_nxt;
         init_finished <= init_finished_nxt;
@@ -66,7 +69,7 @@ always_comb begin : StateMachine
         end
         INIT: begin
             ordered_sets_nxt.SP = 1;
-            if (simplex_operations.aligned) begin
+            if (simplex_aligned) begin
                 if (single_lane) begin
                     state_nxt = VERIFICATION;
                 end
@@ -77,13 +80,13 @@ always_comb begin : StateMachine
         end
         BONDING: begin
             ordered_sets_nxt.I = 1;
-            if (simplex_operations.bonded) begin
+            if (simplex_bonded) begin
                 state_nxt = VERIFICATION;
             end
         end
         VERIFICATION: begin
             ordered_sets_nxt.VER = 1;
-            if (simplex_operations.verified) begin
+            if (simplex_verified) begin
                 state_nxt = READY;
             end
         end
