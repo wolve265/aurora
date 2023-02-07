@@ -29,19 +29,19 @@ package aurora_pkg;
     parameter INTERMEDIATE_DATA_SIZE = 8;
 
     typedef struct packed {
-        logic I;
-        logic SP;
-        logic SPA;
-        logic VER;
-        logic SCP;
-        logic ECP;
-        logic P;
-        logic SUF;
-        logic K;
-        logic R;
-        logic A;
-        logic CC;
         logic SNF;
+        logic CC;
+        logic A;
+        logic R;
+        logic K;
+        logic SUF;
+        logic P;
+        logic ECP;
+        logic SCP;
+        logic VER;
+        logic SPA;
+        logic SP;
+        logic I;
     } ordered_sets_t;
 
 endpackage

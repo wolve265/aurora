@@ -44,10 +44,10 @@ module aurora_top(
         .clk,
         .rst_n,
         .single_lane,
-        .simplex_aligned
-        .simplex_bonded
-        .simplex_verified
-        .simplex_reset
+        .simplex_aligned,
+        .simplex_bonded,
+        .simplex_verified,
+        .simplex_reset,
         .ordered_sets,
         .init_finished(channel_init_finished)
     );

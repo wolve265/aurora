@@ -19,6 +19,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
+import aurora_pkg::*;
 
 module data_controller(
     input logic clk,
@@ -31,5 +32,14 @@ module data_controller(
     input logic axi_last,
     input logic [AXI_DATA_SIZE-1:0] axi_data,
     output logic [MAX_LINKS-1:0][INTERMEDIATE_DATA_SIZE-1:0] data_out
+    );
+
+    logic [INTERMEDIATE_DATA_SIZE-1:0] ordered_sets_encoded_seq;
+
+    ordered_sets_encoder i_ordered_sets_encoder(
+        .clk,
+        .rst_n,
+        .ordered_sets,
+        .encoded_sequence(ordered_sets_encoded_seq)
     );
 endmodule
