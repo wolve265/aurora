@@ -26,8 +26,13 @@ module aurora_tb();
     logic rst_n = 1'b1;
     logic single_lane = 1'b1;
     logic [MAX_LINKS_SIZE-1:0] lane_select = 2'b01;
-    axi_stream_if axi_stream();
-    simplex_operations_if simplex_operations();
+    logic axi_valid,
+    logic axi_last,
+    logic [AXI_DATA_SIZE-1:0] axi_data,
+    logic simplex_aligned,
+    logic simplex_bonded,
+    logic simplex_verified,
+    logic simplex_reset,
     logic [MAX_LINKS-1:0][ENCODED_DATA_SIZE-1:0] data_out;
 
     aurora_top i_aurora_top(
@@ -35,8 +40,13 @@ module aurora_tb();
         .rst_n,
         .single_lane,
         .lane_select,
-        .axi_stream,
-        .simplex_operations,
+        .axi_valid,
+        .axi_last,
+        .axi_data,
+        .simplex_aligned,
+        .simplex_bonded,
+        .simplex_verified,
+        .simplex_reset,
         .data_out
     );
 
