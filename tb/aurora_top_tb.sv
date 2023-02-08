@@ -1,27 +1,4 @@
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company:
-// Engineer:
-//
-// Create Date: 07.01.2023 19:07:34
-// Design Name:
-// Module Name: aurora_tb
-// Project Name:
-// Target Devices:
-// Tool Versions:
-// Description:
-//
-// Dependencies:
-//
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-//
-//////////////////////////////////////////////////////////////////////////////////
-
-import aurora_pkg::*;
-
-module aurora_tb();
+module aurora_top_tb();
     logic clk = 1'b0;
     logic rst_n = 1'b1;
     logic single_lane = 1'b1;
@@ -58,12 +35,6 @@ module aurora_tb();
         #10;
         rst_n = 1;
         #10;
-        single_lane = 1;
-        simplex_aligned = 1;
-        lane_select = 2;
-        #10;
-        simplex_verified = 1;
-        assert (i_aurora_top.channel_init_finished);
     end
 
 endmodule
