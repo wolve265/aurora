@@ -33,7 +33,7 @@ module channel_init (
     output logic init_finished
 );
 
-enum logic [2:0] {
+typedef enum logic [2:0] {
     RESET,
     INIT,
     BONDING,
@@ -46,7 +46,7 @@ states_e state, state_nxt;
 logic init_finished_nxt;
 
 always_ff @(posedge clk) begin
-    if (!rst_n or simplex_reset) begin
+    if (!rst_n || simplex_reset) begin
         state <= RESET;
         ordered_sets <= ordered_sets_nxt;
         init_finished <= init_finished_nxt;
@@ -62,7 +62,7 @@ always_comb begin : StateMachine
     state_nxt = state;
     ordered_sets_nxt = 0;
     init_finished_nxt = 0;
-    case(state) : StateMachineCase
+    case(state)
         RESET: begin
             ordered_sets_nxt.SP = 1;
             state_nxt = INIT;
@@ -96,7 +96,7 @@ always_comb begin : StateMachine
         default: begin
             state_nxt = state;
         end
-    endcase : StateMachineCase
+    endcase
 end : StateMachine
 
 endmodule
