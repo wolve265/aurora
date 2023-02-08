@@ -16,12 +16,13 @@
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
+//  - This module always waits for the end of current sequence, then loads next one.
 //
 //////////////////////////////////////////////////////////////////////////////////
 
 import aurora_pkg::*;
 
-module ordered_sets_encoder(
+module ordered_sets_encoder (
     input logic clk,
     input logic rst_n,
     input ordered_sets_t ordered_sets,
@@ -29,7 +30,7 @@ module ordered_sets_encoder(
     );
 
     typedef enum logic [12:0] {
-        FINISH  = 13'b0_0000_0000_0000,
+        NONE    = 13'b0_0000_0000_0000, // FIXME: delete it?
         I       = 13'b0_0000_0000_0001,
         SP      = 13'b0_0000_0000_0010,
         SPA     = 13'b0_0000_0000_0100,
@@ -48,26 +49,16 @@ module ordered_sets_encoder(
     localparam MAX_SEQUENCE_LEN = 4;
 
     logic [MAX_SEQUENCE_LEN*INTERMEDIATE_DATA_SIZE-1:0] encoded_sequence_buffer, encoded_sequence_buffer_nxt;
-    logic [3:0] counter, counter_nxt;
 
     always_ff @(posedge clk) begin
         if (!rst_n) begin
-            encoded_sequence <= '0;
-            counter <= '0;
+            encoded_sequence_buffer <= '0;
         end else begin
-            counter <= counter_nxt
-            encoded_sequence <= encoded_sequence_buffer[INTERMEDIATE_DATA_SIZE-1:0];
+            encoded_sequence_buffer <= encoded_sequence_buffer_nxt;
         end
     end
 
-    always_comb begin
-        if (encoded_sequence) begin
-            counter_nxt = counter + 1;
-        end else begin
-            counter_nxt = '0;
-        end
-    end
-
+    assign encoded_sequence = encoded_sequence_buffer[INTERMEDIATE_DATA_SIZE-1:0];
 
     // | Special|   Bits    |     RD-     |     RD+     |
     // |  Code  | HGF EDCBA | abcdef ghij | abcdef ghij |
@@ -83,50 +74,56 @@ module ordered_sets_encoder(
     // |  K29.7 | 111_11101 | 101110 1000 | 010001 0111 |
     // |  K30.7 | 111_11110 | 011110 1000 | 100001 0111 |
 
-    // TODO: assign proper full sequence values
     always_comb begin
-        encoded_sequence_buffer_nxt = encoded_sequence_buffer >> INTERMEDIATE_DATA_SIZE;
-        case (ordered_sets)
-            I: begin
-                // TODO: Idle generator
-            end
-            SP: begin
-                encoded_sequence_buffer_nxt = 'b010_01010_010_01010_010_01010_101_11100;
-            end
-            SPA: begin
-                encoded_sequence_buffer_nxt = 'b001_01100_001_01100_001_01100_101_11100;
-            end
-            VER: begin
-                encoded_sequence_buffer_nxt = 'b111_01000_111_01000_111_01000_101_11100;
-            end
-            SCP: begin
-                encoded_sequence_buffer_nxt = 'b111_11011_010_11100;
-            end
-            ECP: begin
-                encoded_sequence_buffer_nxt = 'b111_11110_111_11101;
-            end
-            P, SUF: begin
-                encoded_sequence_buffer_nxt = 'b100_11100;
-            end
-            K: begin
-                encoded_sequence_buffer_nxt = 'b101_11100;
-            end
-            R: begin
-                encoded_sequence_buffer_nxt = 'b000_11100;
-            end
-            A: begin
-                encoded_sequence_buffer_nxt = 'b011_11100;
-            end
-            CC: begin
-                encoded_sequence_buffer_nxt = 'b111_10111_111_10111;
-            end
-            SNF: begin
-                encoded_sequence_buffer_nxt = 'b110_11100;
-            end
-            default: begin
-                encoded_sequence_buffer_nxt = '0;
-            end
-        endcase
+        encoded_sequence_buffer_nxt = '0;
+
+        // if there is something to be shifted, then shift
+        if (encoded_sequence_buffer[MAX_SEQUENCE_LEN*INTERMEDIATE_DATA_SIZE-1:INTERMEDIATE_DATA_SIZE]) begin
+            encoded_sequence_buffer_nxt = encoded_sequence_buffer >> INTERMEDIATE_DATA_SIZE;
+        // otherwise load next data based on input
+        end else begin
+            case (ordered_sets)
+                I: begin
+                    // TODO: Idle generator
+                end
+                SP: begin
+                    encoded_sequence_buffer_nxt = 'b010_01010_010_01010_010_01010_101_11100;
+                end
+                SPA: begin
+                    encoded_sequence_buffer_nxt = 'b001_01100_001_01100_001_01100_101_11100;
+                end
+                VER: begin
+                    encoded_sequence_buffer_nxt = 'b111_01000_111_01000_111_01000_101_11100;
+                end
+                SCP: begin
+                    encoded_sequence_buffer_nxt = 'b111_11011_010_11100;
+                end
+                ECP: begin
+                    encoded_sequence_buffer_nxt = 'b111_11110_111_11101;
+                end
+                P, SUF: begin
+                    encoded_sequence_buffer_nxt = 'b100_11100;
+                end
+                K: begin
+                    encoded_sequence_buffer_nxt = 'b101_11100;
+                end
+                R: begin
+                    encoded_sequence_buffer_nxt = 'b000_11100;
+                end
+                A: begin
+                    encoded_sequence_buffer_nxt = 'b011_11100;
+                end
+                CC: begin
+                    encoded_sequence_buffer_nxt = 'b111_10111_111_10111;
+                end
+                SNF: begin
+                    encoded_sequence_buffer_nxt = 'b110_11100;
+                end
+                default: begin
+                    encoded_sequence_buffer_nxt = '0;
+                end
+            endcase
+        end
     end
 
 endmodule
