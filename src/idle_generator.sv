@@ -34,8 +34,9 @@ module idle_generator (
     logic Acounter_eq_zero;
     logic send_idle_delayed;
 
-    pseudo_random_integer_generator i_pseudo_random_integer_generator(
+    fibonacci_lfsr_7bit i_fibonacci_lfsr_7bit(
         .clk,
+        .rst_n,
         .pseudo_random_bit,
         .pseudo_random_integer
     );

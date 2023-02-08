@@ -5,7 +5,7 @@
 //
 // Create Date: 08.02.2023 20:15:32
 // Design Name:
-// Module Name: pseudo_random_integer_generator
+// Module Name: fibonacci_lfsr_7bit
 // Project Name:
 // Target Devices:
 // Tool Versions:
@@ -19,12 +19,27 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-module pseudo_random_integer_generator(
+module fibonacci_lfsr_7bit(
     input logic clk,
+    input logic rst_n,
     output logic pseudo_random_bit,
     output logic [7:0] pseudo_random_integer
     );
 
-    // TODO: implement pseudo_random
+
+    logic [7:0] data;
+    logic feedback;
+
+    assign feedback = data[7] ^ data[6];
+    assign pseudo_random_bit = feedback;
+    assign pseudo_random_integer = data;
+
+    always_ff @(posedge clk) begin
+        if (!rst_n) begin
+            data <= '0;
+        end else begin
+            data <= {data[6:0], feedback};
+        end
+    end
 
 endmodule
