@@ -50,9 +50,9 @@ module idle_generator (
 
     assign Acounter_eq_zero = !down_counter_out;
 
-    assign send_K = send_idle & (!send_idle_delayed | send_idle_delayed & !Acounter_eq_zero & pseudo_random_bit)
-    assign send_A = send_idle & send_idle_delayed & Acounter_eq_zero
-    assign send_R = send_idle & send_idle_delayed & !Acounter_eq_zero & !pseudo_random_bit
+    assign send_K = send_idle & (!send_idle_delayed | send_idle_delayed & !Acounter_eq_zero & pseudo_random_bit);
+    assign send_A = send_idle & send_idle_delayed & Acounter_eq_zero;
+    assign send_R = send_idle & send_idle_delayed & !Acounter_eq_zero & !pseudo_random_bit;
 
     always_ff @(posedge clk) begin
         send_idle_delayed <= send_idle;
