@@ -5,7 +5,7 @@
 //
 // Create Date: 07.02.2023 19:07:34
 // Design Name:
-// Module Name: encode_tb
+// Module Name: encode_8b10b_tb
 // Project Name:
 // Target Devices:
 // Tool Versions:
@@ -21,7 +21,7 @@
 
 // import aurora_pkg::*;
 
-module encode_tb();
+module encode_8b10b_tb();
     logic clk = 1'b0;
     logic rst_n = 1'b1;
 
@@ -61,6 +61,7 @@ module encode_tb();
         ctrl_i = 0;
         @(posedge clk);
         // FIXME: check why or don't work with assert
+        #0;
         assert(data_o == 'b110010_1110 || data_o == 'b110010_0001);
 
         #10;
@@ -69,6 +70,7 @@ module encode_tb();
         ctrl_i = 1;
         @(posedge clk);
         // FIXME: check why or don't work with assert
+        #0;
         assert(data_o == 'b011110_1000 || data_o == 'b100001_0111);
 
     end

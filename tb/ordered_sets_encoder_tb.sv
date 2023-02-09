@@ -3,9 +3,9 @@
 // Company:
 // Engineer:
 //
-// Create Date: 07.01.2023 19:07:34
+// Create Date: 08.02.2023 19:07:34
 // Design Name:
-// Module Name: aurora_tb
+// Module Name: ordered_sets_encoder_tb
 // Project Name:
 // Target Devices:
 // Tool Versions:
@@ -24,30 +24,14 @@ import aurora_pkg::*;
 module ordered_sets_encoder_tb();
     logic clk = 1'b0;
     logic rst_n = 1'b1;
-    logic single_lane = 1'b1;
-    logic [MAX_LINKS_SIZE-1:0] lane_select = 2'b01;
-    logic axi_valid;
-    logic axi_last;
-    logic [AXI_DATA_SIZE-1:0] axi_data;
-    logic simplex_aligned;
-    logic simplex_bonded;
-    logic simplex_verified;
-    logic simplex_reset;
-    logic [MAX_LINKS-1:0][ENCODED_DATA_SIZE-1:0] encoded_data;
+    ordered_sets_t ordered_sets = '0;
+    logic [INTERMEDIATE_DATA_SIZE-1:0] encoded_sequence;
 
-    aurora_top i_aurora_top(
+    ordered_sets_encoder i_ordered_sets_encoder(
         .clk,
         .rst_n,
-        .single_lane,
-        .lane_select,
-        .axi_valid,
-        .axi_last,
-        .axi_data,
-        .simplex_aligned,
-        .simplex_bonded,
-        .simplex_verified,
-        .simplex_reset,
-        .encoded_data
+        .ordered_sets,
+        .encoded_sequence
     );
 
     always #2.5 clk = ~clk;
@@ -57,13 +41,12 @@ module ordered_sets_encoder_tb();
         rst_n = 0;
         #10;
         rst_n = 1;
-        #10;
-        single_lane = 1;
-        simplex_aligned = 1;
-        lane_select = 2;
-        #10;
-        simplex_verified = 1;
-        assert (i_aurora_top.channel_init_finished);
+        ordered_sets = 1;
+        for (int i = 0; i<13 ; i++) begin
+            #25;
+            ordered_sets = ordered_sets << 1;
+        end
+        #25;
     end
 
 endmodule
