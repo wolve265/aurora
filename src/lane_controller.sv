@@ -31,4 +31,18 @@ module lane_controller(
     output logic [MAX_LINKS-1:0] ctrl_out,
     output logic [MAX_LINKS-1:0][ENCODER_DATA_IN_SIZE-1:0] data_out
     );
+
+    logic send_idle, send_K, send_R, send_A;
+
+    assign send_idle = (ordered_sets == I);
+
+    idle_generator i_idle_generator(
+        .clk,
+        .rst_n,
+        .send_idle,
+        .send_K,
+        .send_A,
+        .send_R
+    );
+
 endmodule
