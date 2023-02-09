@@ -25,26 +25,9 @@ import aurora_pkg::*;
 module ordered_sets_encoder (
     input logic clk,
     input logic rst_n,
-    input ordered_sets_t ordered_sets,
+    input ordered_sets_e ordered_sets,
     output logic [INTERMEDIATE_DATA_SIZE-1:0] encoded_sequence
     );
-
-    typedef enum logic [12:0] {
-        NONE    = 13'b0_0000_0000_0000, // FIXME: delete it?
-        I       = 13'b0_0000_0000_0001,
-        SP      = 13'b0_0000_0000_0010,
-        SPA     = 13'b0_0000_0000_0100,
-        VER     = 13'b0_0000_0000_1000,
-        SCP     = 13'b0_0000_0001_0000,
-        ECP     = 13'b0_0000_0010_0000,
-        P       = 13'b0_0000_0100_0000,
-        SUF     = 13'b0_0000_1000_0000,
-        K       = 13'b0_0001_0000_0000,
-        R       = 13'b0_0010_0000_0000,
-        A       = 13'b0_0100_0000_0000,
-        CC      = 13'b0_1000_0000_0000,
-        SNF     = 13'b1_0000_0000_0000
-    } ordered_sets_e;
 
     localparam MAX_SEQUENCE_LEN = 4;
 

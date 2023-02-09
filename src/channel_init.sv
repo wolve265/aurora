@@ -29,7 +29,7 @@ module channel_init (
     input logic simplex_bonded,
     input logic simplex_verified,
     input logic simplex_reset,
-    output ordered_sets_t ordered_sets,
+    output ordered_sets_e ordered_sets,
     output logic init_finished
 );
 
@@ -41,17 +41,16 @@ typedef enum logic [2:0] {
     READY
 } states_e;
 
-ordered_sets_t ordered_sets_nxt;
+ordered_sets_e ordered_sets_nxt;
 states_e state, state_nxt;
 logic init_finished_nxt;
 
 always_ff @(posedge clk) begin
     if (!rst_n || simplex_reset) begin
         state <= RESET;
-        ordered_sets <= ordered_sets_nxt;
-        init_finished <= init_finished_nxt;
-    end
-    else begin
+        ordered_sets <= NONE;
+        init_finished <= '0;
+    end else begin
         state <= state_nxt;
         ordered_sets <= ordered_sets_nxt;
         init_finished <= init_finished_nxt;
@@ -60,15 +59,15 @@ end
 
 always_comb begin : StateMachine
     state_nxt = state;
-    ordered_sets_nxt = 0;
+    ordered_sets_nxt = NONE;
     init_finished_nxt = 0;
     case(state)
         RESET: begin
-            ordered_sets_nxt.SP = 1;
+            ordered_sets_nxt = SP;
             state_nxt = INIT;
         end
         INIT: begin
-            ordered_sets_nxt.SP = 1;
+            ordered_sets_nxt = SP;
             if (simplex_aligned) begin
                 if (single_lane) begin
                     state_nxt = VERIFICATION;
@@ -79,13 +78,13 @@ always_comb begin : StateMachine
             end
         end
         BONDING: begin
-            ordered_sets_nxt.I = 1;
+            ordered_sets_nxt = I;
             if (simplex_bonded) begin
                 state_nxt = VERIFICATION;
             end
         end
         VERIFICATION: begin
-            ordered_sets_nxt.VER = 1;
+            ordered_sets_nxt = VER;
             if (simplex_verified) begin
                 state_nxt = READY;
             end

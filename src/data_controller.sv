@@ -27,7 +27,7 @@ module data_controller(
     input logic single_lane,
     input logic [MAX_LINKS_SIZE-1:0] lane_select,
     input logic channel_init_finished,
-    input ordered_sets_t ordered_sets,
+    input ordered_sets_e ordered_sets,
     input logic axi_valid,
     input logic axi_last,
     input logic [AXI_DATA_SIZE-1:0] axi_data,

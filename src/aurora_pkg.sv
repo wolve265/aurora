@@ -28,20 +28,12 @@ package aurora_pkg;
     parameter ENCODED_DATA_SIZE = 10;
     parameter INTERMEDIATE_DATA_SIZE = 8;
 
-    typedef struct packed {
-        logic SNF;
-        logic CC;
-        logic A;
-        logic R;
-        logic K;
-        logic SUF;
-        logic P;
-        logic ECP;
-        logic SCP;
-        logic VER;
-        logic SPA;
-        logic SP;
-        logic I;
-    } ordered_sets_t;
+    parameter ORDERED_SETS_NUM = 13;
+    parameter ORDERED_SETS_SIZE = 4; // log2(ORDERED_SETS_NUM)
+
+
+    typedef enum logic [ORDERED_SETS_SIZE-1:0] {
+        NONE, I, SP, SPA, VER, SCP, ECP, P, SUF, K, R, A, CC, SNF
+    } ordered_sets_e;
 
 endpackage
