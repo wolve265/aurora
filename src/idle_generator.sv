@@ -31,6 +31,7 @@ module idle_generator (
     logic [7:0] pseudo_random_integer;
     logic pseudo_random_bit;
 
+    logic down_counter_rst;
     logic [4:0] down_counter_out;
     logic Acounter_eq_zero;
     logic send_idle_delayed;
@@ -44,15 +45,16 @@ module idle_generator (
 
     down_counter i_down_counter(
         .clk,
-        .rst_n,
+        .rst_n(down_counter_rst),
         .load(Acounter_eq_zero),
         .data({1'b1, pseudo_random_integer[3:0]}),
         .count(down_counter_out)
     );
 
+    assign down_counter_rst = !((send_idle & !send_idle_delayed) | !rst_n);
     assign Acounter_eq_zero = !down_counter_out;
 
-    assign send_K = send_idle & (!send_idle_delayed | send_idle_delayed & !Acounter_eq_zero & pseudo_random_bit);
+    assign send_K = send_idle & send_idle_delayed & !Acounter_eq_zero & pseudo_random_bit;
     assign send_A = send_idle & send_idle_delayed & Acounter_eq_zero;
     assign send_R = send_idle & send_idle_delayed & !Acounter_eq_zero & !pseudo_random_bit;
 
