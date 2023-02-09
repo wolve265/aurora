@@ -21,13 +21,16 @@
 
 module down_counter(
     input logic clk,
+    input logic rst_n,
     input logic load,
     input logic [4:0] data,
     output logic [4:0] count
     );
 
     always_ff @(posedge clk) begin
-        if (load) begin
+        if (!rst_n) begin
+            count <= '0;
+        end else if (load) begin
             count <= data;
         end else begin
             count <= count - 1;

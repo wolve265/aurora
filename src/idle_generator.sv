@@ -21,6 +21,7 @@
 
 module idle_generator (
     input logic clk,
+    input logic rst_n,
     input logic send_idle,
     output logic send_K,
     output logic send_A,
@@ -43,6 +44,7 @@ module idle_generator (
 
     down_counter i_down_counter(
         .clk,
+        .rst_n,
         .load(Acounter_eq_zero),
         .data({1'b1, pseudo_random_integer[3:0]}),
         .count(down_counter_out)

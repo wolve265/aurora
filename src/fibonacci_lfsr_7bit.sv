@@ -10,6 +10,8 @@
 // Target Devices:
 // Tool Versions:
 // Description:
+//  - Linear Feedback Shift Register from
+//    https://airhdl.com/blog/2022/09/18/new-generator-linear-feedack-shift-register/
 //
 // Dependencies:
 //
@@ -23,14 +25,14 @@ module fibonacci_lfsr_7bit(
     input logic clk,
     input logic rst_n,
     output logic pseudo_random_bit,
-    output logic [7:0] pseudo_random_integer
+    output logic [6:0] pseudo_random_integer
     );
 
 
-    logic [7:0] data;
+    logic [6:0] data;
     logic feedback;
 
-    assign feedback = data[7] ^ data[6];
+    assign feedback = ~(data[6] ^ data[5]);
     assign pseudo_random_bit = feedback;
     assign pseudo_random_integer = data;
 
@@ -38,7 +40,7 @@ module fibonacci_lfsr_7bit(
         if (!rst_n) begin
             data <= '0;
         end else begin
-            data <= {data[6:0], feedback};
+            data <= {data[5:0], feedback};
         end
     end
 
