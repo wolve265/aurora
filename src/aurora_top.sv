@@ -40,7 +40,7 @@ module aurora_top(
     ordered_sets_e ordered_sets;
     logic [MAX_LINKS-1:0][INTERMEDIATE_DATA_SIZE-1:0] intermediate_data;
 
-    channel_init i_channel_init(
+    channel_initializer i_channel_initializer(
         .clk,
         .rst_n,
         .single_lane,
