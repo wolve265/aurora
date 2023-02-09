@@ -25,10 +25,10 @@ package aurora_pkg;
     parameter MAX_LINKS = 4;
     parameter MAX_LINKS_SIZE = 2; // log2(MAX_LINKS)
     parameter AXI_DATA_SIZE = 64;
-    parameter ENCODED_DATA_SIZE = 10;
-    parameter INTERMEDIATE_DATA_SIZE = 8;
+    parameter ENCODER_DATA_IN_SIZE = 8;
+    parameter ENCODER_DATA_OUT_SIZE = 10;
 
-    parameter ORDERED_SEQUENCE_LEN = 4;
+    parameter ORDERED_SEQUENCE_MAX_LEN = 4;
 
 
     // | Special|   Bits    |     RD-     |     RD+     |
@@ -46,7 +46,7 @@ package aurora_pkg;
     // |  K30.7 | 111_11110 | 011110 1000 | 100001 0111 |
 
 
-    typedef enum logic [ORDERED_SEQUENCE_LEN*INTERMEDIATE_DATA_SIZE-1:0] {
+    typedef enum logic [ORDERED_SEQUENCE_MAX_LEN*ENCODER_DATA_IN_SIZE-1:0] {
         NONE    = '0,                                         // just none
         I       = 'b01,                                       // idle must be generated pseudo-randomly
         SP      = 'b010_01010_010_01010_010_01010_101_11100,  // K28.5, D10.2, D10.2, D10.2
