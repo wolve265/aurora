@@ -33,7 +33,7 @@ module aurora_top(
     input logic simplex_bonded,
     input logic simplex_verified,
     input logic simplex_reset,
-    output logic [MAX_LINKS-1:0][ENCODER_DATA_OUT_SIZE-1:0] encoder_data_out
+    output logic [MAX_LINKS-1:0][ENCODER_DATA_OUT_SIZE-1:0] data_out
     );
 
     logic channel_init_finished;
@@ -94,7 +94,7 @@ module aurora_top(
                 .ctrl_i(encoder_ctrl_in[i]),
                 .disp_i(1'b0),
                 .data_i(encoder_data_in[i]),
-                .data_o(encoder_data_out[i]),
+                .data_o(data_out[i]),
                 .disp_o()
             );
         end
