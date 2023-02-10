@@ -38,6 +38,7 @@ module data_controller(
         LAST
     } state_e;
 
+    logic axi_valid_prev;
     state_e state, state_nxt;
     ordered_sets_e ordered_sets_nxt;
     logic [AXI_DATA_SIZE-1:0] data_out_nxt;
@@ -47,10 +48,12 @@ module data_controller(
             state <= IDLE;
             ordered_sets <= NONE;
             data_out <= '0;
+            axi_valid_prev <= '0;
         end else begin
             state <= state_nxt;
             ordered_sets <= ordered_sets_nxt;
             data_out <= data_out_nxt;
+            axi_valid_prev <= axi_valid;
         end
     end
 
@@ -61,7 +64,7 @@ module data_controller(
 
         case (state)
             IDLE: begin
-                if (axi_valid) begin
+                if (axi_valid & !axi_valid_prev) begin
                     ordered_sets_nxt = SCP;
                     state_nxt = STREAM;
                 end
