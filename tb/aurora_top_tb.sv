@@ -33,7 +33,7 @@ module aurora_top_tb();
     logic simplex_bonded;
     logic simplex_verified;
     logic simplex_reset;
-    logic [MAX_LINKS-1:0][ENCODED_DATA_SIZE-1:0] encoded_data;
+    logic [MAX_LINKS-1:0][ENCODER_DATA_OUT_SIZE-1:0] data_out;
 
     aurora_top i_aurora_top(
         .clk,
@@ -47,7 +47,7 @@ module aurora_top_tb();
         .simplex_bonded,
         .simplex_verified,
         .simplex_reset,
-        .encoded_data
+        .data_out
     );
 
     always #2.5 clk = ~clk;

@@ -25,23 +25,41 @@ package aurora_pkg;
     parameter MAX_LINKS = 4;
     parameter MAX_LINKS_SIZE = 2; // log2(MAX_LINKS)
     parameter AXI_DATA_SIZE = 64;
-    parameter ENCODED_DATA_SIZE = 10;
-    parameter INTERMEDIATE_DATA_SIZE = 8;
+    parameter ENCODER_DATA_IN_SIZE = 8;
+    parameter ENCODER_DATA_OUT_SIZE = 10;
 
-    typedef struct packed {
-        logic SNF;
-        logic CC;
-        logic A;
-        logic R;
-        logic K;
-        logic SUF;
-        logic P;
-        logic ECP;
-        logic SCP;
-        logic VER;
-        logic SPA;
-        logic SP;
-        logic I;
-    } ordered_sets_t;
+    parameter ORDERED_SEQUENCE_MAX_LEN = 4;
+
+
+    // | Special|   Bits    |     RD-     |     RD+     |
+    // |  Code  | HGF EDCBA | abcdef ghij | abcdef ghij |
+    // |------------------------------------------------|
+    // |  K23.7 | 111_10111 | 111010 1000 | 000101 0111 |
+    // |  K27.7 | 111_11011 | 110110 1000 | 001001 0111 |
+    // |  K28.0 | 000_11100 | 001111 0100 | 110000 1011 |
+    // |  K28.2 | 010_11100 | 001111 0101 | 110000 1010 |
+    // |  K28.3 | 011_11100 | 001111 0011 | 110000 1100 |
+    // |  K28.4 | 100_11100 | 001111 0010 | 110000 1101 |
+    // |  K28.5 | 101_11100 | 001111 1010 | 110000 0101 |
+    // |  K28.6 | 110_11100 | 001111 0110 | 110000 1001 |
+    // |  K29.7 | 111_11101 | 101110 1000 | 010001 0111 |
+    // |  K30.7 | 111_11110 | 011110 1000 | 100001 0111 |
+
+
+    typedef enum logic [ORDERED_SEQUENCE_MAX_LEN*ENCODER_DATA_IN_SIZE-1:0] {
+        NONE    = '0,                                         // just none
+        I       = 'b01,                                       // idle must be generated pseudo-randomly
+        SP      = 'b010_01010_010_01010_010_01010_101_11100,  // K28.5, D10.2, D10.2, D10.2
+        SPA     = 'b001_01100_001_01100_001_01100_101_11100,  // K28.5, D12.1, D12.1, D12.1
+        VER     = 'b111_01000_111_01000_111_01000_101_11100,  // K28.5, D08.7, D08.7, D08.7
+        SCP     = 'b000_00000_000_00000_111_11011_010_11100,  // K28.2, K27.7
+        ECP     = 'b000_00000_000_00000_111_11110_111_11101,  // K29.7, K30.7
+        P_SUF   = 'b000_00000_000_00000_000_00000_100_11100,  // K28.4
+        K       = 'b000_00000_000_00000_000_00000_101_11100,  // K28.5
+        R       = 'b000_00000_000_00000_000_00000_000_11100,  // K28.0
+        A       = 'b000_00000_000_00000_000_00000_011_11100,  // K28.3
+        CC      = 'b000_00000_000_00000_111_10111_111_10111,  // K23.7, K23.7
+        SNF     = 'b000_00000_000_00000_000_00000_110_11100   // K28.6
+    } ordered_sets_e;
 
 endpackage

@@ -33,14 +33,25 @@ module aurora_top(
     input logic simplex_bonded,
     input logic simplex_verified,
     input logic simplex_reset,
-    output logic [MAX_LINKS-1:0][ENCODED_DATA_SIZE-1:0] encoded_data
+    output logic [MAX_LINKS-1:0][ENCODER_DATA_OUT_SIZE-1:0] data_out
     );
 
     logic channel_init_finished;
-    ordered_sets_t ordered_sets;
-    logic [MAX_LINKS-1:0][INTERMEDIATE_DATA_SIZE-1:0] intermediate_data;
+    ordered_sets_e channel_init_ordered_sets;
 
-    channel_init i_channel_init(
+    ordered_sets_e data_controller_ordered_sets;
+
+    logic [AXI_DATA_SIZE-1:0] lane_controller_data_in;
+    ordered_sets_e lane_controller_ordered_sets;
+
+    logic [MAX_LINKS-1:0][ENCODER_DATA_IN_SIZE-1:0] encoder_data_in;
+    logic [MAX_LINKS-1:0] encoder_ctrl_in;
+
+    assign lane_controller_ordered_sets = (
+        channel_init_finished ? channel_init_ordered_sets : data_controller_ordered_sets
+    );
+
+    channel_initializer i_channel_initializer(
         .clk,
         .rst_n,
         .single_lane,
@@ -48,7 +59,7 @@ module aurora_top(
         .simplex_bonded,
         .simplex_verified,
         .simplex_reset,
-        .ordered_sets,
+        .ordered_sets(channel_init_ordered_sets),
         .init_finished(channel_init_finished)
     );
 
@@ -56,13 +67,22 @@ module aurora_top(
         .clk,
         .rst_n,
         .single_lane,
-        .lane_select,
-        .channel_init_finished,
-        .ordered_sets,
         .axi_valid,
         .axi_last,
         .axi_data,
-        .data_out(intermediate_data)
+        .ordered_sets(data_controller_ordered_sets),
+        .data_out(lane_controller_data_in)
+    );
+
+    lane_controller i_lane_controller(
+        .clk,
+        .rst_n,
+        .single_lane,
+        .lane_select,
+        .ordered_sets(lane_controller_ordered_sets),
+        .data_in(lane_controller_data_in),
+        .ctrl_out(encoder_ctrl_in),
+        .data_out(encoder_data_in)
     );
 
     genvar i;
@@ -71,10 +91,10 @@ module aurora_top(
             encode_8b10b i_encode_8b10b(
                 .clk_i(clk),
                 .rst_n_i(rst_n),
-                .ctrl_i(),
+                .ctrl_i(encoder_ctrl_in[i]),
                 .disp_i(1'b0),
-                .data_i(intermediate_data[i]),
-                .data_o(encoded_data[i]),
+                .data_i(encoder_data_in[i]),
+                .data_o(data_out[i]),
                 .disp_o()
             );
         end
