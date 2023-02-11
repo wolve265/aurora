@@ -26,12 +26,30 @@ module lane_controller_tb();
     logic clk_200MHz = 1'b0;
     logic clk_50MHz = 1'b0;
     logic rst_n = 1'b1;
+
     logic single_lane = '0;
     logic [MAX_LINKS_SIZE-1:0] lane_select = '0;
-    logic [AXI_DATA_SIZE-1:0] data_in = '0;
-    ordered_sets_e ordered_sets = NONE;
+
+    logic axi_valid = '0;
+    logic axi_last = '0;
+    logic [AXI_DATA_SIZE-1:0] axi_data = '0;
+
+    logic [AXI_DATA_SIZE-1:0] data;
+    ordered_sets_e ordered_sets;
+
     logic [MAX_LINKS-1:0] ctrl_out;
     logic [MAX_LINKS-1:0][ENCODER_DATA_IN_SIZE-1:0] data_out;
+
+    data_controller i_data_controller(
+        .clk(clk_400MHz),
+        .rst_n,
+        .single_lane,
+        .axi_valid,
+        .axi_last,
+        .axi_data,
+        .ordered_sets,
+        .data_out(data)
+    );
 
     lane_controller i_lane_controller(
         .clk(clk_400MHz),
@@ -39,9 +57,9 @@ module lane_controller_tb();
         .single_lane,
         .lane_select,
         .ordered_sets,
-        .data_in,
-        .ctrl_out(encoder_ctrl_in),
-        .data_out(encoder_data_in)
+        .data_in(data),
+        .ctrl_out,
+        .data_out
     );
 
     always #2.5 clk_400MHz = ~clk_400MHz;
@@ -59,8 +77,28 @@ module lane_controller_tb();
     initial begin : stimulus
         int repeat_num;
         #30; // wait reset done
-        #200;
+        @(posedge clk_50MHz);
         single_lane = 1;
+        repeat_num = 1;
+        for (int i = 0; i<2; i++) begin
+            // none 50MHz cycles are needed between any two messages
+            if (i == 1) begin
+                repeat_num = 7;
+            end
+            for (int j = 0; j<repeat_num; j++) begin
+                @(posedge clk_50MHz);
+                axi_data = {32'hDEADB00D, j};
+                axi_valid = 1;
+                if (j >= 2 && j <= 4) begin
+                    axi_valid = 0;
+                end
+            end
+            axi_last = 1;
+            @(posedge clk_50MHz);
+            axi_data = '0;
+            axi_valid = 0;
+            axi_last = 0;
+        end
     end : stimulus
 
 endmodule
