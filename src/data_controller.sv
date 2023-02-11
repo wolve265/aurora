@@ -22,8 +22,9 @@
 import aurora_pkg::*;
 
 module data_controller(
-    input logic clk_data,
+    input logic clk,
     input logic rst_n,
+    input logic single_lane,
     input logic axi_valid,
     input logic axi_last,
     input logic [AXI_DATA_SIZE-1:0] axi_data,
@@ -31,13 +32,18 @@ module data_controller(
     output logic [AXI_DATA_SIZE-1:0] data_out
     );
 
-    typedef enum logic [1:0] {
+    typedef enum logic [2:0] {
         IDLE,
+        FRAME_START,
         STREAM,
-        LAST
+        PACKET_END,
+        FRAME_END
     } state_e;
 
     state_e state, state_nxt;
+
+    logic [3:0] data_counter, data_counter_nxt, data_counter_max;
+    assign data_counter_max = single_lane ? 8 : 2;
 
     logic axi_valid_delayed;
     logic axi_last_delayed;
@@ -46,11 +52,12 @@ module data_controller(
     ordered_sets_e ordered_sets_nxt;
     logic [AXI_DATA_SIZE-1:0] data_out_nxt;
 
-    always_ff @(posedge clk_data) begin
+    always_ff @(posedge clk) begin
         if (!rst_n) begin
             state <= IDLE;
             ordered_sets <= NONE;
             data_out <= '0;
+            data_counter <= '0;
             axi_valid_delayed <= '0;
             axi_last_delayed <= '0;
             axi_data_delayed <= '0;
@@ -58,9 +65,12 @@ module data_controller(
             state <= state_nxt;
             ordered_sets <= ordered_sets_nxt;
             data_out <= data_out_nxt;
-            axi_valid_delayed <= axi_valid;
-            axi_last_delayed <= axi_last;
-            axi_data_delayed <= axi_data;
+            data_counter <= data_counter_nxt;
+            if ((state != STREAM) | (data_counter == data_counter_max-1)) begin
+                axi_valid_delayed <= axi_valid;
+                axi_last_delayed <= axi_last;
+                axi_data_delayed <= axi_data;
+            end
         end
     end
 
@@ -68,25 +78,45 @@ module data_controller(
         state_nxt = state;
         ordered_sets_nxt = NONE;
         data_out_nxt = '0;
+        data_counter_nxt = data_counter + 1;
 
         case (state)
             IDLE: begin
+                ordered_sets_nxt = I;
                 if (axi_valid) begin
-                    ordered_sets_nxt = SCP;
-                    state_nxt = STREAM;
+                    state_nxt = FRAME_START;
+                    data_counter_nxt = 0;
                 end
+            end
+            FRAME_START: begin
+                if (data_counter_nxt == 2) begin
+                    state_nxt = STREAM;
+                    data_counter_nxt = 0;
+                end
+                ordered_sets_nxt = SCP;
             end
             STREAM: begin
                 data_out_nxt = axi_data_delayed;
                 if (!axi_valid_delayed) begin
                     ordered_sets_nxt = I;
-                end else if (axi_last_delayed) begin
-                    state_nxt = LAST;
+                    data_out_nxt = '0;
+                end
+                if (data_counter_nxt == data_counter_max) begin
+                    data_counter_nxt = 0;
+                    if (axi_last_delayed) begin
+                        state_nxt = FRAME_END;
+                    end
                 end
             end
-            LAST: begin
+            FRAME_END: begin
+                if (data_counter_nxt == 2) begin
+                    state_nxt = IDLE;
+                    if (axi_valid) begin
+                        state_nxt = FRAME_START;
+                        data_counter_nxt = 0;
+                    end
+                end
                 ordered_sets_nxt = ECP;
-                state_nxt = IDLE;
             end
             default: begin
                 state_nxt = state;
