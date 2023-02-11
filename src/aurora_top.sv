@@ -36,6 +36,8 @@ module aurora_top(
     output logic [MAX_LINKS-1:0][ENCODER_DATA_OUT_SIZE-1:0] data_out
     );
 
+    logic clk_data;
+
     logic channel_init_finished;
     ordered_sets_e channel_init_ordered_sets;
 
@@ -63,10 +65,16 @@ module aurora_top(
         .init_finished(channel_init_finished)
     );
 
-    data_controller i_data_controller(
-        .clk,
+    clock_divider i_clock_divider(
+        .clk_in(clk),
         .rst_n,
         .single_lane,
+        .clk_out(clk_data)
+    );
+
+    data_controller i_data_controller(
+        .clk_data,
+        .rst_n,
         .axi_valid,
         .axi_last,
         .axi_data,
@@ -76,6 +84,7 @@ module aurora_top(
 
     lane_controller i_lane_controller(
         .clk,
+        .clk_data,
         .rst_n,
         .single_lane,
         .lane_select,

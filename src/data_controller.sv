@@ -22,9 +22,8 @@
 import aurora_pkg::*;
 
 module data_controller(
-    input logic clk,  // data clock
+    input logic clk_data,
     input logic rst_n,
-    input logic single_lane,
     input logic axi_valid,
     input logic axi_last,
     input logic [AXI_DATA_SIZE-1:0] axi_data,
@@ -47,7 +46,7 @@ module data_controller(
     ordered_sets_e ordered_sets_nxt;
     logic [AXI_DATA_SIZE-1:0] data_out_nxt;
 
-    always_ff @(posedge clk) begin
+    always_ff @(posedge clk_data) begin
         if (!rst_n) begin
             state <= IDLE;
             ordered_sets <= NONE;
