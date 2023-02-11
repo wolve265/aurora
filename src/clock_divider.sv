@@ -28,23 +28,23 @@ module clock_divider(
     output logic clk_out
     );
 
-    logic [1:0] counter, counter_init;
+    logic _clk = 0;
+    logic [1:0] counter = 0;
+    logic [1:0] counter_init;
+
     // N/2-1  | clk_in / N
     //   3    | clk_in / 8
     //   0    | clk_in / 2
     assign counter_init = single_lane ? 3 : 0;
+    assign clk_out = _clk;
 
     always_ff @(posedge clk_in) begin
-        if (!rst_n) begin
-            counter <= counter_init;
-            clk_out <= 0;
+        if (counter == counter_init) begin
+            _clk <= ~_clk;
+            counter <= 0;
         end else begin
-            if (counter == counter_init) begin
-                clk_out <= ~clk_out;
-                counter <= 0;
-            end else begin
-                counter <= counter + 1;
-            end
+            _clk <= _clk;
+            counter <= counter + 1;
         end
     end
 

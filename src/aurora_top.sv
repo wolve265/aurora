@@ -67,7 +67,6 @@ module aurora_top(
 
     clock_divider i_clock_divider(
         .clk_in(clk),
-        .rst_n,
         .single_lane,
         .clk_out(clk_data)
     );
