@@ -42,6 +42,8 @@ module lane_controller(
     } state_e;
 
     state_e state, state_nxt;
+    logic [0:ORDERED_SEQUENCE_MAX_LEN-1][ENCODER_DATA_IN_SIZE-1:0] ordered_sets_array;
+    assign ordered_sets_array = ordered_sets;
 
     logic [1:0] counter_50MHz;
     logic clk_400MHz, clk_200MHz, clk_50MHz, clk_data_in;
@@ -55,7 +57,7 @@ module lane_controller(
     logic send_idle, send_K, send_R, send_A;
     assign send_idle = (ordered_sets == I);
 
-    always_ff @(posedge clk) begin
+    always_ff @(posedge clk_400MHz) begin
         if (!rst_n) begin
             ctrl_out <= '0;
             data_out <= '0;
@@ -69,6 +71,57 @@ module lane_controller(
         end
     end
 
+    always_comb begin
+        state_nxt = state;
+        ctrl_enabled_nxt = ctrl_enabled;
+        ctrl_out_nxt = ctrl_enabled ? '1 : '0;
+        data_out_nxt = '0;
+        case (state)
+            IDLE: begin
+                if (ordered_sets_array) begin
+                    ctrl_enabled_nxt = 1;
+                    state_nxt = ORDERED_SETS1;
+                end
+            end
+            ORDERED_SETS1: begin
+                data_out_nxt[lane_select] = ordered_sets_array[0];
+                if (ordered_sets_array[0] == K28_5) begin
+                    ctrl_enabled_nxt = 0;
+                end
+                if (ordered_sets_array[1]) begin
+                    state_nxt = ORDERED_SETS2;
+                end else begin
+                    state_nxt = IDLE;
+                end
+            end
+            ORDERED_SETS2: begin
+                data_out_nxt[lane_select] = ordered_sets_array[1];
+                if (ordered_sets_array[2]) begin
+                    state_nxt = ORDERED_SETS3;
+                end else begin
+                    state_nxt = IDLE;
+                end
+            end
+            ORDERED_SETS3: begin
+                data_out_nxt[lane_select] = ordered_sets_array[2];
+                if (ordered_sets_array[3]) begin
+                    state_nxt = ORDERED_SETS4;
+                end else begin
+                    state_nxt = IDLE;
+                end
+            end
+            ORDERED_SETS4: begin
+                data_out_nxt[lane_select] = ordered_sets_array[3];
+                state_nxt = IDLE;
+            end
+            DATA: begin
+                // TODO:
+            end
+            default: begin
+                state_nxt = state;
+            end
+        endcase
+    end
 
 
 
