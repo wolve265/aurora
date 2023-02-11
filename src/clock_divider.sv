@@ -23,7 +23,6 @@ import aurora_pkg::*;
 
 module clock_divider(
     input logic clk_in,
-    input logic rst_n,
     input logic single_lane,
     output logic clk_out
     );
