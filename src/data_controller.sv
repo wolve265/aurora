@@ -43,7 +43,7 @@ module data_controller(
     state_e state, state_nxt;
 
     logic [3:0] data_counter, data_counter_nxt, data_counter_max;
-    assign data_counter_max = single_lane ? 8 : 2;
+    assign data_counter_max = single_lane ? SYS_TO_SINGLE_LINE_CLK_RATIO : SYS_TO_MULTI_LINE_CLK_RATIO;
 
     logic axi_valid_delayed;
     logic axi_last_delayed;
@@ -52,25 +52,27 @@ module data_controller(
     ordered_sets_e ordered_sets_nxt;
     logic [AXI_DATA_SIZE-1:0] data_out_nxt;
 
+    delay #(
+        .WIDTH(AXI_DATA_SIZE+2),
+        .CLK_DEL(3)
+    ) i_delay (
+        .clk,
+        .rst_n,
+        .din({axi_data, axi_valid, axi_last}),
+        .dout({axi_data_delayed, axi_valid_delayed, axi_last_delayed})
+    );
+
     always_ff @(posedge clk) begin
         if (!rst_n) begin
             state <= IDLE;
             ordered_sets <= NONE;
             data_out <= '0;
             data_counter <= '0;
-            axi_valid_delayed <= '0;
-            axi_last_delayed <= '0;
-            axi_data_delayed <= '0;
         end else begin
             state <= state_nxt;
             ordered_sets <= ordered_sets_nxt;
             data_out <= data_out_nxt;
             data_counter <= data_counter_nxt;
-            if ((state != STREAM) | (data_counter == data_counter_max-1)) begin
-                axi_valid_delayed <= axi_valid;
-                axi_last_delayed <= axi_last;
-                axi_data_delayed <= axi_data;
-            end
         end
     end
 
