@@ -47,8 +47,8 @@ module lane_controller_tb();
 
     data_controller i_data_controller(
         .clk,
-        .single_lane,
         .rst_n,
+        .single_lane,
         .axi_valid,
         .axi_last,
         .axi_data,
