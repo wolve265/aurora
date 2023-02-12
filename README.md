@@ -1,6 +1,6 @@
-# Aurora 8b/10b Simplex Transceiver
+# Aurora 8b/10b Simplex Transmitter
 
-Implementation of the Aurora 8b/10b Simplex Transceiver
+Implementation of the Aurora 8b/10b Simplex Transmitter
 
 ## Parameters
 
@@ -9,6 +9,7 @@ Name | Value
 maximum links | 4
 duplex | no
 input data protocol | axi stream (valid, last, data)
+output data protocol | Aurora 8b/10b
 modes | single lane / multi lane
 single lane selection | 0 / 1 / 2 / 3
 single lane data clock | system clock / 8
