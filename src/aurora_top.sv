@@ -21,7 +21,7 @@
 
 import aurora_pkg::*;
 
-module aurora_top(
+module aurora_top (
     input logic clk,
     input logic rst_n,
     input logic single_lane,
@@ -46,9 +46,10 @@ module aurora_top(
 
     logic [`MAX_LINKS-1:0][`ENCODER_DATA_IN_SIZE-1:0] encoder_data_in;
     logic [`MAX_LINKS-1:0] encoder_ctrl_in;
+    logic [`MAX_LINKS-1:0] disp_i, disp_o;
 
     assign lane_controller_ordered_sets = (
-        channel_init_finished ? channel_init_ordered_sets : data_controller_ordered_sets
+        channel_init_finished ? data_controller_ordered_sets : channel_init_ordered_sets
     );
 
     channel_initializer i_channel_initializer(
@@ -85,19 +86,12 @@ module aurora_top(
         .data_out(encoder_data_in)
     );
 
-    genvar i;
-    generate
-        for(i = 0; i < `MAX_LINKS; i++)begin
-            encode_8b10b i_encode_8b10b(
-                .clk_i(clk),
-                .rst_n_i(rst_n),
-                .ctrl_i(encoder_ctrl_in[i]),
-                .disp_i(1'b0),
-                .data_i(encoder_data_in[i]),
-                .data_o(data_out[i]),
-                .disp_o()
-            );
-        end
-    endgenerate
+    encoder i_encoder(
+        .clk,
+        .rst_n,
+        .ctrl_in(encoder_ctrl_in),
+        .data_in(encoder_data_in),
+        .data_out
+    );
 
 endmodule

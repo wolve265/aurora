@@ -87,6 +87,7 @@ module channel_initializer (
                 ordered_sets_nxt = VER;
                 if (simplex_verified) begin
                     state_nxt = READY;
+                    init_finished_nxt = 1;
                 end
             end
             READY: begin
