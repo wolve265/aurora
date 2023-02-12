@@ -78,11 +78,11 @@ module lane_controller_tb();
 
     initial begin : stimulus
         int repeat_num;
+        single_lane = 0;
+        lane_select = 2;
         #20; // wait reset done
 
         @(negedge clk_data);
-        single_lane = 1;
-        lane_select = 2;
         repeat_num = 1;
         for (int i = 0; i<2; i++) begin
             if (!single_lane) begin
