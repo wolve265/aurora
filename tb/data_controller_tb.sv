@@ -28,9 +28,9 @@ module data_controller_tb();
     logic single_lane = '0;
     logic axi_valid = '0;
     logic axi_last = '0;
-    logic [AXI_DATA_SIZE-1:0] axi_data = '0;
+    logic [`AXI_DATA_SIZE-1:0] axi_data = '0;
     ordered_sets_e ordered_sets;
-    logic [AXI_DATA_SIZE-1:0] data_out;
+    logic [`AXI_DATA_SIZE-1:0] data_out;
 
     clock_divider i_clock_divider(
         .clk_in(clk),
@@ -39,8 +39,9 @@ module data_controller_tb();
     );
 
     data_controller i_data_controller(
-        .clk_data,
+        .clk,
         .rst_n,
+        .single_lane,
         .axi_valid,
         .axi_last,
         .axi_data,
@@ -51,7 +52,6 @@ module data_controller_tb();
     always #2.5 clk = ~clk;
 
     initial begin : reset_block
-        #10;
         rst_n = 0;
         #10;
         rst_n = 1;
@@ -60,9 +60,10 @@ module data_controller_tb();
 
     initial begin : stimulus
         int repeat_num;
-        #30; // wait reset done
+        #20; // wait reset done
 
         // 200MHz
+        @(negedge clk_data);
         single_lane = 0;
         repeat_num = 1;
         for (int i = 0; i<2; i++) begin
@@ -87,12 +88,13 @@ module data_controller_tb();
         end
 
         #100;
+        @(negedge clk);
 
         // 50MHz
         single_lane = 1;
         repeat_num = 1;
         for (int i = 0; i<2; i++) begin
-            // none 50MHz cycles are needed between any two messages
+            // half 50MHz cycles are needed between any two messages (got one)
             if (i == 1) begin
                 repeat_num = 7;
             end

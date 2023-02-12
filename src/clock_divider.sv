@@ -34,7 +34,9 @@ module clock_divider(
     // N/2-1  | clk_in / N
     //   3    | clk_in / 8
     //   0    | clk_in / 2
-    assign counter_init = single_lane ? 3 : 0;
+    localparam SINGLE_LANE_COUNTER_INIT = `SYS_TO_SINGLE_LINE_CLK_RATIO/2-1;
+    localparam MULTI_LANE_COUNTER_INIT = `SYS_TO_MULTI_LINE_CLK_RATIO/2-1;
+    assign counter_init = single_lane ? SINGLE_LANE_COUNTER_INIT : MULTI_LANE_COUNTER_INIT;
     assign clk_out = _clk;
 
     always_ff @(posedge clk_in) begin

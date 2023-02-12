@@ -27,9 +27,9 @@ module data_controller(
     input logic single_lane,
     input logic axi_valid,
     input logic axi_last,
-    input logic [AXI_DATA_SIZE-1:0] axi_data,
+    input logic [`AXI_DATA_SIZE-1:0] axi_data,
     output ordered_sets_e ordered_sets,
-    output logic [AXI_DATA_SIZE-1:0] data_out
+    output logic [`AXI_DATA_SIZE-1:0] data_out
     );
 
     typedef enum logic [2:0] {
@@ -43,17 +43,17 @@ module data_controller(
     state_e state, state_nxt;
 
     logic [3:0] data_counter, data_counter_nxt, data_counter_max;
-    assign data_counter_max = single_lane ? SYS_TO_SINGLE_LINE_CLK_RATIO : SYS_TO_MULTI_LINE_CLK_RATIO;
+    assign data_counter_max = single_lane ? `SYS_TO_SINGLE_LINE_CLK_RATIO : `SYS_TO_MULTI_LINE_CLK_RATIO;
 
     logic axi_valid_delayed;
     logic axi_last_delayed;
-    logic [AXI_DATA_SIZE-1:0] axi_data_delayed;
+    logic [`AXI_DATA_SIZE-1:0] axi_data_delayed;
 
     ordered_sets_e ordered_sets_nxt;
-    logic [AXI_DATA_SIZE-1:0] data_out_nxt;
+    logic [`AXI_DATA_SIZE-1:0] data_out_nxt;
 
     delay #(
-        .WIDTH(AXI_DATA_SIZE+2),
+        .WIDTH(`AXI_DATA_SIZE+2),
         .CLK_DEL(3)
     ) i_delay (
         .clk,

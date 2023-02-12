@@ -25,15 +25,15 @@ module aurora_top(
     input logic clk,
     input logic rst_n,
     input logic single_lane,
-    input logic [MAX_LINKS_SIZE-1:0] lane_select,
+    input logic [`MAX_LINKS_SIZE-1:0] lane_select,
     input logic axi_valid,
     input logic axi_last,
-    input logic [AXI_DATA_SIZE-1:0] axi_data,
+    input logic [`AXI_DATA_SIZE-1:0] axi_data,
     input logic simplex_aligned,
     input logic simplex_bonded,
     input logic simplex_verified,
     input logic simplex_reset,
-    output logic [MAX_LINKS-1:0][ENCODER_DATA_OUT_SIZE-1:0] data_out
+    output logic [`MAX_LINKS-1:0][`ENCODER_DATA_OUT_SIZE-1:0] data_out
     );
 
     logic clk_data;
@@ -43,11 +43,11 @@ module aurora_top(
 
     ordered_sets_e data_controller_ordered_sets;
 
-    logic [AXI_DATA_SIZE-1:0] lane_controller_data_in;
+    logic [`AXI_DATA_SIZE-1:0] lane_controller_data_in;
     ordered_sets_e lane_controller_ordered_sets;
 
-    logic [MAX_LINKS-1:0][ENCODER_DATA_IN_SIZE-1:0] encoder_data_in;
-    logic [MAX_LINKS-1:0] encoder_ctrl_in;
+    logic [`MAX_LINKS-1:0][`ENCODER_DATA_IN_SIZE-1:0] encoder_data_in;
+    logic [`MAX_LINKS-1:0] encoder_ctrl_in;
 
     assign lane_controller_ordered_sets = (
         channel_init_finished ? channel_init_ordered_sets : data_controller_ordered_sets
@@ -72,8 +72,9 @@ module aurora_top(
     );
 
     data_controller i_data_controller(
-        .clk_data,
+        .clk,
         .rst_n,
+        .single_lane,
         .axi_valid,
         .axi_last,
         .axi_data,
@@ -95,7 +96,7 @@ module aurora_top(
 
     genvar i;
     generate
-        for(i = 0; i < MAX_LINKS; i++)begin
+        for(i = 0; i < `MAX_LINKS; i++)begin
             encode_8b10b i_encode_8b10b(
                 .clk_i(clk),
                 .rst_n_i(rst_n),

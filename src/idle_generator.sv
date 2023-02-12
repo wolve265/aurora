@@ -28,7 +28,7 @@ module idle_generator (
     output logic send_R
     );
 
-    logic [7:0] pseudo_random_integer;
+    logic [6:0] pseudo_random_integer;
     logic pseudo_random_bit;
 
     logic [4:0] down_counter_out;
