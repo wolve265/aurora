@@ -69,17 +69,17 @@ package aurora_pkg;
     typedef enum logic [`ORDERED_SEQUENCE_SIZE-1:0] {
         NONE    = '0,   // just none
         I       = 'b01, // idle must be generated pseudo-randomly
-        SP      = {    `D10_2, `D10_2, `D10_2, `K28_5},
-        SPA     = {    `D12_1, `D12_1, `D12_1, `K28_5},
-        VER     = {    `D08_7, `D08_7, `D08_7, `K28_5},
-        SCP     = {'0, `K27_7, `K28_2},
-        ECP     = {'0, `K30_7, `K29_7},
-        P_SUF   = {'0, `K28_4},
-        K       = {'0, `K28_5},
-        R       = {'0, `K28_0},
-        A       = {'0, `K28_3},
-        CC      = {'0, `K23_7, `K23_7},
-        SNF     = {'0, `K28_6}
+        SP      = {`D10_2, `D10_2, `D10_2, `K28_5},
+        SPA     = {`D12_1, `D12_1, `D12_1, `K28_5},
+        VER     = {`D08_7, `D08_7, `D08_7, `K28_5},
+        SCP     = {16'b0, `K27_7, `K28_2},
+        ECP     = {16'b0, `K30_7, `K29_7},
+        P_SUF   = {24'b0, `K28_4},
+        K       = {24'b0, `K28_5},
+        R       = {24'b0, `K28_0},
+        A       = {24'b0, `K28_3},
+        CC      = {16'b0, `K23_7, `K23_7},
+        SNF     = {24'b0, `K28_6}
     } ordered_sets_e;
 
 endpackage
